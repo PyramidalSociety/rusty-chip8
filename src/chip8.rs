@@ -1,6 +1,8 @@
 use std::{fs, io, path};
 
 const START_ADDRESS: usize = 0x200;
+const FONTSET_SIZE: usize = 80;
+const FONTSET_START_ADDRESS: usize = 0x50;
 
 pub struct Chip8 {
     registers: [u8; 16],
@@ -50,6 +52,44 @@ impl Chip8 {
         }
 
         self.memory[START_ADDRESS..end].copy_from_slice(&bytes);
+
+        let fontset: [u8; FONTSET_SIZE] = [
+            0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+            0x20, 0x60, 0x20, 0x20, 0x70, // 1
+            0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+            0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+            0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+            0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+            0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+            0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+            0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+            0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+            0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+            0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+            0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+            0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+            0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+            0xF0, 0x80, 0xF0, 0x80, 0x80, // F
+        ];
+
+        let end = FONTSET_START_ADDRESS + FONTSET_SIZE;
+
+        self.memory[FONTSET_START_ADDRESS..end].copy_from_slice(&fontset);
+
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn correct_mem() {
+        let dummy = Chip8::new(path::Path::new("tests/fixtures/test_opcode.ch8")).unwrap();
+
+        assert_eq!(dummy.memory[FONTSET_START_ADDRESS], 0xF0);
+        assert_eq!(dummy.memory[FONTSET_START_ADDRESS + FONTSET_SIZE - 1], 0x80);
+        assert_eq!(dummy.memory[START_ADDRESS], 0x12);
     }
 }
