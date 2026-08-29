@@ -101,12 +101,16 @@ mod tests {
     }
 
     #[test]
-    fn clear_display() {
+    fn cls_test() {
         let mut dummy = Chip8::new(path::Path::new("tests/fixtures/test_opcode.ch8")).unwrap();
 
-        dummy.video[0] = true;
+        for i in 0..2048 {
+            dummy.video[i] = true;
+        }
         dummy.cls_00e0();
 
-        assert_eq!(dummy.video[0], false);
+        for i in 0..2048 {
+            assert_eq!(dummy.video[i], false);
+        }
     }
 }
