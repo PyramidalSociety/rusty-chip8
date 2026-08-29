@@ -18,6 +18,7 @@ pub struct Chip8 {
     opcode: u16,
 }
 
+// Creating a new Chip8 instance
 impl Chip8 {
     pub fn new(pth: &path::Path) -> Result<Self, io::Error> {
         let mut new_obj = Chip8 {
@@ -80,6 +81,12 @@ impl Chip8 {
     }
 }
 
+impl Chip8 {
+    fn cls_00e0(&mut self) {
+        self.video[..].fill(false);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -91,5 +98,15 @@ mod tests {
         assert_eq!(dummy.memory[FONTSET_START_ADDRESS], 0xF0);
         assert_eq!(dummy.memory[FONTSET_START_ADDRESS + FONTSET_SIZE - 1], 0x80);
         assert_eq!(dummy.memory[START_ADDRESS], 0x12);
+    }
+
+    #[test]
+    fn clear_display() {
+        let mut dummy = Chip8::new(path::Path::new("tests/fixtures/test_opcode.ch8")).unwrap();
+
+        dummy.video[0] = true;
+        dummy.cls_00e0();
+
+        assert_eq!(dummy.video[0], false);
     }
 }
