@@ -195,6 +195,12 @@ impl Chip8 {
     fn jp_v0_bnnn(&mut self, nnn: u16) {
         self.pc = self.registers[0] as u16 + nnn;
     }
+
+    fn rnd_cxkk(&mut self, x: u8, kk: u8) {
+        let rnd: u8 = rand::random();
+
+        self.registers[x as usize] = rnd & kk;
+    }
 }
 
 #[cfg(test)]
