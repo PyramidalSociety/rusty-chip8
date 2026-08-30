@@ -30,7 +30,7 @@ impl Chip8 {
             registers: [0; NUM_REGISTERS],
             memory: [0; MEM_SIZE],
             index: 0,
-            pc: 0,
+            pc: START_ADDRESS as u16,
             stack: [0; STACK_SIZE],
             sp: 0,
             delay_timer: 0,
@@ -187,6 +187,14 @@ impl Chip8 {
 
         self.registers[x as usize] <<= 1;
     }
+
+    fn ld_i_annn(&mut self, nnn: u16) {
+        self.index = nnn;
+    }
+
+    fn jp_v0_bnnn(&mut self, nnn: u16) {
+        self.pc = self.registers[0] as u16 + nnn;
+    }
 }
 
 #[cfg(test)]
@@ -312,5 +320,22 @@ mod tests {
         dummy.shl_8xye(0);
         assert_eq!(dummy.registers[0], 254);
         assert_eq!(dummy.registers[0xF], 0);
+    }
+
+    #[test]
+    fn ld_i_test() {
+        let mut dummy = Chip8::new(path::Path::new("tests/fixtures/test_opcode.ch8")).unwrap();
+
+        dummy.ld_i_annn(1024);
+        assert_eq!(dummy.index, 1024);
+    }
+
+    #[test]
+    fn jp_v0_test() {
+        let mut dummy = Chip8::new(path::Path::new("tests/fixtures/test_opcode.ch8")).unwrap();
+
+        dummy.ld_6xkk(0, 0xFF);
+        dummy.jp_v0_bnnn(0x400);
+        assert_eq!(dummy.pc, 0x4FF);
     }
 }
