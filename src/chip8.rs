@@ -138,6 +138,55 @@ impl Chip8 {
     fn add_7xkk(&mut self, x: u8, kk: u8) {
         self.registers[x as usize] = self.registers[x as usize].overflowing_add(kk).0;
     }
+
+    fn ld_8xy0(&mut self, x: u8, y: u8) {
+        self.registers[x as usize] = self.registers[y as usize];
+    }
+
+    fn or_8xy1(&mut self, x: u8, y: u8) {
+        self.registers[x as usize] |= self.registers[y as usize];
+    }
+
+    fn and_8xy2(&mut self, x: u8, y: u8) {
+        self.registers[x as usize] &= self.registers[y as usize];
+    }
+
+    fn xor_8xy3(&mut self, x: u8, y: u8) {
+        self.registers[x as usize] ^= self.registers[y as usize];
+    }
+
+    fn add_8xy4(&mut self, x: u8, y: u8) {
+        let sum = self.registers[x as usize].overflowing_add(self.registers[y as usize]);
+
+        self.registers[0xF] = sum.1 as u8;
+        self.registers[x as usize] = sum.0;
+    }
+
+    fn sub_8xy5(&mut self, x: u8, y: u8) {
+        let diff = self.registers[x as usize].overflowing_sub(self.registers[y as usize]);
+
+        self.registers[0xF] = diff.1 as u8;
+        self.registers[x as usize] = diff.0;
+    }
+
+    fn shr_8xy6(&mut self, x: u8) {
+        self.registers[0xF] = self.registers[x as usize] & 1;
+
+        self.registers[x as usize] >>= 1;
+    }
+
+    fn subn_8xy7(&mut self, x: u8, y: u8) {
+        let diff = self.registers[y as usize].overflowing_sub(self.registers[x as usize]);
+
+        self.registers[0xF] = diff.1 as u8;
+        self.registers[x as usize] = diff.0;
+    }
+
+    fn shl_8xye(&mut self, x: u8) {
+        self.registers[0xF] = (self.registers[x as usize] & 0x80) >> 0x7;
+
+        self.registers[x as usize] <<= 1;
+    }
 }
 
 #[cfg(test)]
@@ -181,5 +230,87 @@ mod tests {
         assert_eq!(dummy.registers[2], 9);
 
         assert_eq!(dummy.registers[0], 0);
+    }
+
+    #[test]
+    fn instr_8xyd() {
+        let mut dummy = Chip8::new(path::Path::new("tests/fixtures/test_opcode.ch8")).unwrap();
+
+        dummy.ld_6xkk(0, 10);
+        dummy.ld_6xkk(1, 11);
+        dummy.ld_8xy0(0, 1);
+        assert_eq!(dummy.registers[0], dummy.registers[1]);
+        assert_eq!(dummy.registers[0], 11);
+
+        dummy.ld_6xkk(0, 8);
+        dummy.ld_6xkk(1, 7);
+        dummy.or_8xy1(0, 1);
+        assert_eq!(dummy.registers[0], 15);
+
+        dummy.ld_6xkk(0, 14);
+        dummy.ld_6xkk(1, 7);
+        dummy.and_8xy2(0, 1);
+        assert_eq!(dummy.registers[0], 6);
+
+        dummy.ld_6xkk(0, 14);
+        dummy.ld_6xkk(1, 7);
+        dummy.xor_8xy3(0, 1);
+        assert_eq!(dummy.registers[0], 9);
+
+        dummy.ld_6xkk(0, 255);
+        dummy.ld_6xkk(1, 10);
+        dummy.add_8xy4(0, 1);
+        assert_eq!(dummy.registers[0], 9);
+        assert_eq!(dummy.registers[0xF], 1);
+
+        dummy.ld_6xkk(0, 32);
+        dummy.ld_6xkk(1, 64);
+        dummy.add_8xy4(0, 1);
+        assert_eq!(dummy.registers[0], 96);
+        assert_eq!(dummy.registers[0xF], 0);
+
+        dummy.ld_6xkk(0, 10);
+        dummy.ld_6xkk(1, 9);
+        dummy.sub_8xy5(0, 1);
+        assert_eq!(dummy.registers[0], 1);
+        assert_eq!(dummy.registers[0xF], 0);
+
+        dummy.ld_6xkk(0, 9);
+        dummy.ld_6xkk(1, 10);
+        dummy.sub_8xy5(0, 1);
+        assert_eq!(dummy.registers[0], 255);
+        assert_eq!(dummy.registers[0xF], 1);
+
+        dummy.ld_6xkk(0, 7);
+        dummy.shr_8xy6(0);
+        assert_eq!(dummy.registers[0], 3);
+        assert_eq!(dummy.registers[0xF], 1);
+
+        dummy.ld_6xkk(0, 6);
+        dummy.shr_8xy6(0);
+        assert_eq!(dummy.registers[0], 3);
+        assert_eq!(dummy.registers[0xF], 0);
+
+        dummy.ld_6xkk(0, 9);
+        dummy.ld_6xkk(1, 10);
+        dummy.subn_8xy7(0, 1);
+        assert_eq!(dummy.registers[0], 1);
+        assert_eq!(dummy.registers[0xF], 0);
+
+        dummy.ld_6xkk(0, 10);
+        dummy.ld_6xkk(1, 9);
+        dummy.subn_8xy7(0, 1);
+        assert_eq!(dummy.registers[0], 255);
+        assert_eq!(dummy.registers[0xF], 1);
+
+        dummy.ld_6xkk(0, 255);
+        dummy.shl_8xye(0);
+        assert_eq!(dummy.registers[0], 254);
+        assert_eq!(dummy.registers[0xF], 1);
+
+        dummy.ld_6xkk(0, 127);
+        dummy.shl_8xye(0);
+        assert_eq!(dummy.registers[0], 254);
+        assert_eq!(dummy.registers[0xF], 0);
     }
 }
