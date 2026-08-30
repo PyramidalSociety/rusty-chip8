@@ -112,6 +112,24 @@ impl Chip8 {
         self.sp += 1;
         self.pc = nnn;
     }
+
+    fn se_3xkk(&mut self, x: u8, kk: u8) {
+        if self.registers[x as usize] == kk {
+            self.pc += 2;
+        }
+    }
+
+    fn sne_4xkk(&mut self, x: u8, kk: u8) {
+        if self.registers[x as usize] != kk {
+            self.pc += 2;
+        }
+    }
+
+    fn se_5xy0(&mut self, x: u8, y: u8) {
+        if self.registers[x as usize] == self.registers[y as usize] {
+            self.pc += 2;
+        }
+    }
 }
 
 #[cfg(test)]
