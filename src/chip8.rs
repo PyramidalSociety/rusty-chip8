@@ -4,35 +4,39 @@ const START_ADDRESS: usize = 0x200;
 const FONTSET_SIZE: usize = 80;
 const FONTSET_START_ADDRESS: usize = 0x50;
 
+const NUM_REGISTERS: usize = 16;
+const MEM_SIZE: usize = 4096;
+const STACK_SIZE: usize = 16;
+const KEYPAD_SIZE: usize = 16;
+const VIDEO_SIZE: usize = 64 * 32;
+
 pub struct Chip8 {
-    registers: [u8; 16],
-    memory: [u8; 4096],
+    registers: [u8; NUM_REGISTERS],
+    memory: [u8; MEM_SIZE],
     index: u16,
     pc: u16,
-    stack: [u16; 16],
+    stack: [u16; STACK_SIZE],
     sp: u8,
     delay_timer: u8,
     sound_timer: u8,
-    keypad: [u8; 16],
-    video: [bool; 64 * 32],
-    opcode: u16,
+    keypad: [u8; KEYPAD_SIZE],
+    video: [bool; VIDEO_SIZE],
 }
 
 // Creating a new Chip8 instance
 impl Chip8 {
     pub fn new(pth: &path::Path) -> Result<Self, io::Error> {
         let mut new_obj = Chip8 {
-            registers: [0; 16],
-            memory: [0; 4096],
+            registers: [0; NUM_REGISTERS],
+            memory: [0; MEM_SIZE],
             index: 0,
             pc: 0,
-            stack: [0; 16],
+            stack: [0; STACK_SIZE],
             sp: 0,
             delay_timer: 0,
             sound_timer: 0,
-            keypad: [0; 16],
-            video: [false; 64 * 32],
-            opcode: 0x200,
+            keypad: [0; KEYPAD_SIZE],
+            video: [false; VIDEO_SIZE],
         };
 
         new_obj.load_rom(pth)?;
@@ -84,6 +88,29 @@ impl Chip8 {
 impl Chip8 {
     fn cls_00e0(&mut self) {
         self.video[..].fill(false);
+    }
+
+    fn ret_00ee(&mut self) {
+        if self.sp == 0 {
+            panic!("Stack pointer underflow");
+        }
+
+        self.sp -= 1;
+        self.pc = self.stack[self.sp as usize];
+    }
+
+    fn jp_1nnn(&mut self, nnn: u16) {
+        self.pc = nnn;
+    }
+
+    fn call_2nnn(&mut self, nnn: u16) {
+        if self.sp as usize == STACK_SIZE {
+            panic!("Stack overflow");
+        }
+
+        self.stack[self.sp as usize] = self.pc;
+        self.sp += 1;
+        self.pc = nnn;
     }
 }
 
