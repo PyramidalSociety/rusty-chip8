@@ -130,6 +130,14 @@ impl Chip8 {
             self.pc += 2;
         }
     }
+
+    fn ld_6xkk(&mut self, x: u8, kk: u8) {
+        self.registers[x as usize] = kk;
+    }
+
+    fn add_7xkk(&mut self, x: u8, kk: u8) {
+        self.registers[x as usize] = self.registers[x as usize].overflowing_add(kk).0;
+    }
 }
 
 #[cfg(test)]
@@ -157,5 +165,21 @@ mod tests {
         for i in 0..2048 {
             assert_eq!(dummy.video[i], false);
         }
+    }
+
+    #[test]
+    fn assignation_test() {
+        let mut dummy = Chip8::new(path::Path::new("tests/fixtures/test_opcode.ch8")).unwrap();
+
+        dummy.ld_6xkk(2, 254);
+        assert_eq!(dummy.registers[2], 254);
+
+        dummy.add_7xkk(2, 1);
+        assert_eq!(dummy.registers[2], 255);
+
+        dummy.add_7xkk(2, 10);
+        assert_eq!(dummy.registers[2], 9);
+
+        assert_eq!(dummy.registers[0], 0);
     }
 }
