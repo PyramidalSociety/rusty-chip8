@@ -21,7 +21,7 @@ pub struct Chip8 {
     sp: u8,
     delay_timer: u8,
     sound_timer: u8,
-    keypad: [u8; KEYPAD_SIZE],
+    keypad: [bool; KEYPAD_SIZE],
     video: [bool; VIDEO_SIZE],
 }
 
@@ -37,7 +37,7 @@ impl Chip8 {
             sp: 0,
             delay_timer: 0,
             sound_timer: 0,
-            keypad: [0; KEYPAD_SIZE],
+            keypad: [false; KEYPAD_SIZE],
             video: [false; VIDEO_SIZE],
         };
 
@@ -241,6 +241,30 @@ impl Chip8 {
 
                 *screen_px ^= sprite_px;
             }
+        }
+    }
+
+    fn skp_ex9e(&mut self, x: u8) {
+        let key = self.registers[x as usize];
+
+        if key > 0xF {
+            return;
+        }
+
+        if self.keypad[key as usize] {
+            self.pc += 2;
+        }
+    }
+
+    fn sknp_exa1(&mut self, x: u8) {
+        let key = self.registers[x as usize];
+
+        if key > 0xF {
+            return;
+        }
+
+        if !self.keypad[key as usize] {
+            self.pc += 2;
         }
     }
 }
