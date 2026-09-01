@@ -214,7 +214,7 @@ impl Chip8 {
 
         for row in 0..height {
             if self.index as usize + row >= MEM_SIZE {
-                panic!("Out of memory bounds while getting the sprite byte");
+                break;
             }
 
             if row + pos_y >= VIDEO_HEIGHT {
