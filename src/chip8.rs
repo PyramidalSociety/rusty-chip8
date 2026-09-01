@@ -9,6 +9,8 @@ const MEM_SIZE: usize = 4096;
 const STACK_SIZE: usize = 16;
 const KEYPAD_SIZE: usize = 16;
 const VIDEO_SIZE: usize = 64 * 32;
+const VIDEO_HEIGHT: usize = 32;
+const VIDEO_WIDTH: usize = 64;
 
 pub struct Chip8 {
     registers: [u8; NUM_REGISTERS],
@@ -85,6 +87,7 @@ impl Chip8 {
     }
 }
 
+// CPU instructions
 impl Chip8 {
     fn cls_00e0(&mut self) {
         self.video[..].fill(false);
@@ -200,6 +203,45 @@ impl Chip8 {
         let rnd: u8 = rand::random();
 
         self.registers[x as usize] = rnd & kk;
+    }
+
+    fn drw_dxyn(&mut self, x: u8, y: u8, n: u8) {
+        let pos_x = self.registers[x as usize] as usize % VIDEO_WIDTH;
+        let pos_y = self.registers[y as usize] as usize % VIDEO_HEIGHT;
+        let height = n as usize;
+
+        self.registers[0xF] = 0;
+
+        for row in 0..height {
+            if self.index as usize + row >= MEM_SIZE {
+                panic!("Out of memory bounds while getting the sprite byte");
+            }
+
+            if row + pos_y >= VIDEO_HEIGHT {
+                break;
+            }
+
+            let sprite = self.memory[self.index as usize + row];
+
+            for col in 0..8 {
+                if col + pos_x >= VIDEO_WIDTH {
+                    break;
+                }
+
+                let sprite_px = (sprite & (0x80 >> col)) != 0;
+                let screen_px = &mut self.video[(pos_y + row) * VIDEO_WIDTH + pos_x + col];
+
+                if sprite_px {
+                    continue;
+                }
+
+                if *screen_px {
+                    self.registers[0xF] = 1;
+                }
+
+                *screen_px ^= sprite_px;
+            }
+        }
     }
 }
 
