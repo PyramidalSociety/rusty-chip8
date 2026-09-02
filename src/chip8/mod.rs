@@ -1,5 +1,6 @@
 use std::{fs, io, path};
 
+mod cycle;
 mod instructions;
 
 const START_ADDRESS: usize = 0x200;
