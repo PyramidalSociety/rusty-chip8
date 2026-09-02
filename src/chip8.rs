@@ -314,6 +314,26 @@ impl Chip8 {
 
         self.memory[self.index as usize] = val;
     }
+
+    fn ld_fx55(&mut self, x: u8) {
+        for i in 0..=self.registers[x as usize] {
+            if self.index + i as u16 >= MEM_SIZE as u16 {
+                break;
+            }
+
+            self.memory[self.index as usize + i as usize] = self.registers[i as usize];
+        }
+    }
+
+    fn ld_fx65(&mut self, x: u8) {
+        for i in 0..=self.registers[x as usize] {
+            if self.index + i as u16 >= MEM_SIZE as u16 || i as usize >= NUM_REGISTERS {
+                break;
+            }
+
+            self.registers[i as usize] = self.memory[self.index as usize + i as usize];
+        }
+    }
 }
 
 #[cfg(test)]
@@ -490,5 +510,31 @@ mod tests {
         assert_eq!(dummy.memory[0], 1);
         assert_eq!(dummy.memory[1], 2);
         assert_eq!(dummy.memory[2], 8);
+    }
+
+    #[test]
+    fn ld_reg_mem() {
+        let mut dummy = Chip8::new(path::Path::new("tests/fixtures/test_opcode.ch8")).unwrap();
+
+        dummy.ld_6xkk(0, 1);
+        dummy.ld_6xkk(1, 2);
+        dummy.ld_6xkk(2, 3);
+        dummy.ld_6xkk(3, 4);
+        dummy.ld_6xkk(4, 5);
+
+        dummy.ld_fx55(5);
+        assert_eq!(dummy.registers[0], 1);
+        assert_eq!(dummy.registers[1], 2);
+        assert_eq!(dummy.registers[2], 3);
+        assert_eq!(dummy.registers[3], 4);
+        assert_eq!(dummy.registers[4], 5);
+        assert_eq!(dummy.registers[5], 0);
+
+        dummy.ld_6xkk(0, 128);
+        dummy.ld_fx33(0);
+        dummy.ld_fx65(2);
+        assert_eq!(dummy.registers[0], 1);
+        assert_eq!(dummy.registers[1], 2);
+        assert_eq!(dummy.registers[2], 8);
     }
 }
