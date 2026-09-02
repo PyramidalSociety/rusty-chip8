@@ -267,6 +267,31 @@ impl Chip8 {
             self.pc += 2;
         }
     }
+
+    fn ld_fx07(&mut self, x: u8) {
+        self.registers[x as usize] = self.delay_timer;
+    }
+
+    fn ld_fx0a(&mut self, x: u8) {
+        for i in 0..=16 {
+            if i == 16 {
+                self.pc -= 2;
+            }
+
+            if self.keypad[i] {
+                self.registers[x as usize] = i as u8;
+                break;
+            }
+        }
+    }
+
+    fn ld_fx15(&mut self, x: u8) {
+        self.delay_timer = self.registers[x as usize];
+    }
+
+    fn ld_fx18(&mut self, x: u8) {
+        self.sound_timer = self.registers[x as usize];
+    }
 }
 
 #[cfg(test)]
@@ -409,5 +434,20 @@ mod tests {
         dummy.ld_6xkk(0, 0xFF);
         dummy.jp_v0_bnnn(0x400);
         assert_eq!(dummy.pc, 0x4FF);
+    }
+
+    #[test]
+    fn ld_dt_st_test() {
+        let mut dummy = Chip8::new(path::Path::new("tests/fixtures/test_opcode.ch8")).unwrap();
+
+        dummy.ld_6xkk(0, 15);
+        dummy.ld_fx15(0);
+        dummy.ld_fx07(1);
+        dummy.ld_fx18(1);
+
+        assert_eq!(dummy.registers[0], 15);
+        assert_eq!(dummy.registers[1], 15);
+        assert_eq!(dummy.delay_timer, 15);
+        assert_eq!(dummy.sound_timer, 15);
     }
 }
