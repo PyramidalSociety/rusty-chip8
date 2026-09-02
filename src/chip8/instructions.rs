@@ -103,6 +103,12 @@ impl Chip8 {
         self.registers[x as usize] <<= 1;
     }
 
+    fn sne_9xy0(&mut self, x: u8, y: u8) {
+        if self.registers[x as usize] != self.registers[y as usize] {
+            self.pc += 2;
+        }
+    }
+
     fn ld_annn(&mut self, nnn: u16) {
         self.index = nnn;
     }
