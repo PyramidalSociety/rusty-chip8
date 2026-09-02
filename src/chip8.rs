@@ -191,7 +191,7 @@ impl Chip8 {
         self.registers[x as usize] <<= 1;
     }
 
-    fn ld_i_annn(&mut self, nnn: u16) {
+    fn ld_annn(&mut self, nnn: u16) {
         self.index = nnn;
     }
 
@@ -291,6 +291,28 @@ impl Chip8 {
 
     fn ld_fx18(&mut self, x: u8) {
         self.sound_timer = self.registers[x as usize];
+    }
+
+    fn add_fx1e(&mut self, x: u8) {
+        self.index += self.registers[x as usize] as u16;
+    }
+
+    fn ld_fx29(&mut self, x: u8) {
+        let digit = self.registers[x as usize];
+
+        self.index = FONTSET_START_ADDRESS as u16 + 5 * digit as u16;
+    }
+
+    fn ld_fx33(&mut self, x: u8) {
+        let mut val = self.registers[x as usize];
+
+        self.memory[self.index as usize + 2] = val % 10;
+        val /= 10;
+
+        self.memory[self.index as usize + 1] = val % 10;
+        val /= 10;
+
+        self.memory[self.index as usize] = val;
     }
 }
 
@@ -420,11 +442,18 @@ mod tests {
     }
 
     #[test]
-    fn ld_i_test() {
+    fn ld_add_index_test() {
         let mut dummy = Chip8::new(path::Path::new("tests/fixtures/test_opcode.ch8")).unwrap();
 
-        dummy.ld_i_annn(1024);
+        dummy.ld_annn(1024);
         assert_eq!(dummy.index, 1024);
+
+        dummy.ld_6xkk(0, 10);
+        dummy.add_fx1e(0);
+        assert_eq!(dummy.index, 1034);
+
+        dummy.ld_fx29(0);
+        assert_eq!(dummy.index, 130);
     }
 
     #[test]
@@ -449,5 +478,17 @@ mod tests {
         assert_eq!(dummy.registers[1], 15);
         assert_eq!(dummy.delay_timer, 15);
         assert_eq!(dummy.sound_timer, 15);
+    }
+
+    #[test]
+    fn ld_bcd_test() {
+        let mut dummy = Chip8::new(path::Path::new("tests/fixtures/test_opcode.ch8")).unwrap();
+
+        dummy.ld_6xkk(0, 128);
+        dummy.ld_fx33(0);
+
+        assert_eq!(dummy.memory[0], 1);
+        assert_eq!(dummy.memory[1], 2);
+        assert_eq!(dummy.memory[2], 8);
     }
 }
