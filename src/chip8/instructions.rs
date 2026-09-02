@@ -149,7 +149,7 @@ impl Chip8 {
                 let sprite_px = (sprite & (0x80 >> col)) != 0;
                 let screen_px = &mut self.video[(pos_y + row) * VIDEO_WIDTH + pos_x + col];
 
-                if sprite_px {
+                if !sprite_px {
                     continue;
                 }
 
@@ -194,6 +194,7 @@ impl Chip8 {
         for i in 0..=16 {
             if i == 16 {
                 self.pc -= 2;
+                break;
             }
 
             if self.keypad[i] {
@@ -235,7 +236,7 @@ impl Chip8 {
 
     pub(super) fn ld_fx55(&mut self, x: u8) {
         for i in 0..=self.registers[x as usize] {
-            if self.index + i as u16 >= MEM_SIZE as u16 {
+            if self.index + i as u16 >= MEM_SIZE as u16 || i as usize >= NUM_REGISTERS {
                 break;
             }
 
