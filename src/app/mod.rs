@@ -2,6 +2,7 @@ use crate::chip8::Chip8;
 use std::{io, path::Path};
 
 mod draw;
+pub mod run;
 
 pub struct App {
     chip8: Chip8,
