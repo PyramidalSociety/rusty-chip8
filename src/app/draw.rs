@@ -1,11 +1,11 @@
-use std::ops::Deref;
-
 use ratatui::{
     Frame,
-    style::Color,
-    symbols::Marker::HalfBlock,
+    layout::Alignment,
+    style::{Color, Style},
+    symbols::Marker,
+    text::{Line, Span},
     widgets::{
-        Block,
+        Block, Borders, Paragraph,
         canvas::{Canvas, Points},
     },
 };
@@ -17,31 +17,40 @@ const VIDEO_WIDTH: usize = 64;
 
 impl App {
     pub(super) fn draw(&self, frame: &mut Frame) {
-        let points: Vec<(_, _)> = self
-            .chip8
-            .get_video()
-            .iter()
-            .enumerate()
-            .filter(|(_, px)| **px)
-            .map(|(i, _)| {
-                let x = (i % VIDEO_WIDTH) as f64;
-                let y = (VIDEO_HEIGHT - 1 - i / VIDEO_WIDTH) as f64;
-                (x, y)
-            })
-            .collect();
+        let area = frame.area();
 
-        let canvas = Canvas::default()
-            .block(Block::bordered().title("Rusty CHIP8"))
-            .marker(HalfBlock)
-            .x_bounds([0.0, VIDEO_WIDTH as f64])
-            .y_bounds([0.0, VIDEO_HEIGHT as f64])
-            .paint(|ctx| {
-                ctx.draw(&Points {
-                    coords: &points,
-                    color: Color::Green,
-                });
-            });
+        let block = Block::default()
+            .borders(Borders::ALL)
+            .title("Rusty CHIP-8")
+            .title_alignment(Alignment::Center);
 
-        frame.render_widget(canvas, frame.area());
+        let inner = block.inner(area);
+        frame.render_widget(block, area);
+
+        let video = self.chip8.get_video();
+        let width = inner.width as usize;
+        let height = inner.height as usize;
+
+        let mut lines: Vec<Line> = Vec::with_capacity(height);
+
+        for ty in 0..height {
+            let py = (ty * VIDEO_HEIGHT) / height.max(1);
+
+            let mut spans: Vec<Span> = Vec::with_capacity(width);
+
+            for tx in 0..width {
+                let px = (tx * VIDEO_WIDTH) / width.max(1);
+
+                if video[py * VIDEO_WIDTH + px] {
+                    spans.push(Span::styled("█", Style::default().fg(Color::Green)));
+                } else {
+                    spans.push(Span::raw(" "));
+                }
+            }
+
+            lines.push(Line::from(spans));
+        }
+
+        frame.render_widget(Paragraph::new(lines), inner);
     }
 }
