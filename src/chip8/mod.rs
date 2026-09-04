@@ -30,7 +30,7 @@ pub struct Chip8 {
 }
 
 impl Chip8 {
-    pub fn new(pth: &path::Path) -> Result<Self, io::Error> {
+    pub fn new(pth: &path::Path) -> io::Result<Chip8> {
         let mut new_obj = Chip8 {
             registers: [0; NUM_REGISTERS],
             memory: [0; MEM_SIZE],

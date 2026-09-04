@@ -7,7 +7,7 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(pth: &Path) -> Result<Self, io::Error> {
+    pub fn new(pth: &Path) -> io::Result<App> {
         Ok(Self {
             chip8: Chip8::new(&pth)?,
             exit: false,
