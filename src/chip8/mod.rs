@@ -2,6 +2,7 @@ use std::{fs, io, path};
 
 mod cycle;
 mod instructions;
+pub mod interface;
 
 const START_ADDRESS: usize = 0x200;
 const FONTSET_SIZE: usize = 80;
