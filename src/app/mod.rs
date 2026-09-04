@@ -1,6 +1,8 @@
 use crate::chip8::Chip8;
 use std::{io, path::Path};
 
+mod draw;
+
 pub struct App {
     chip8: Chip8,
     exit: bool,
