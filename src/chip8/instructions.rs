@@ -235,7 +235,7 @@ impl Chip8 {
     }
 
     pub(super) fn ld_fx55(&mut self, x: u8) {
-        for i in 0..=self.registers[x as usize] {
+        for i in 0..=x {
             if self.index + i as u16 >= MEM_SIZE as u16 || i as usize >= NUM_REGISTERS {
                 break;
             }
@@ -245,7 +245,7 @@ impl Chip8 {
     }
 
     pub(super) fn ld_fx65(&mut self, x: u8) {
-        for i in 0..=self.registers[x as usize] {
+        for i in 0..=x {
             if self.index + i as u16 >= MEM_SIZE as u16 || i as usize >= NUM_REGISTERS {
                 break;
             }
