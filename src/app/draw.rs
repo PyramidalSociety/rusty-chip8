@@ -2,12 +2,8 @@ use ratatui::{
     Frame,
     layout::Alignment,
     style::{Color, Style},
-    symbols::Marker,
     text::{Line, Span},
-    widgets::{
-        Block, Borders, Paragraph,
-        canvas::{Canvas, Points},
-    },
+    widgets::{Block, Borders, Paragraph},
 };
 
 use super::*;
