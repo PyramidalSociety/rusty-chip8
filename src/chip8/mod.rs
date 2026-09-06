@@ -1,8 +1,9 @@
-use std::{fs, io, path};
+use std::{fs, io, path, time::Instant};
 
 mod cycle;
 mod instructions;
 pub mod interface;
+pub mod keypress;
 
 const START_ADDRESS: usize = 0x200;
 const FONTSET_SIZE: usize = 80;
@@ -27,10 +28,11 @@ pub struct Chip8 {
     sound_timer: u8,
     keypad: [bool; KEYPAD_SIZE],
     video: [bool; VIDEO_SIZE],
+    last_keypress: [Option<Instant>; KEYPAD_SIZE],
 }
 
 impl Chip8 {
-    pub fn new(pth: &path::Path) -> Result<Self, io::Error> {
+    pub fn new(pth: &path::Path) -> io::Result<Chip8> {
         let mut new_obj = Chip8 {
             registers: [0; NUM_REGISTERS],
             memory: [0; MEM_SIZE],
@@ -42,6 +44,7 @@ impl Chip8 {
             sound_timer: 0,
             keypad: [false; KEYPAD_SIZE],
             video: [false; VIDEO_SIZE],
+            last_keypress: [None; KEYPAD_SIZE],
         };
 
         new_obj.load_rom(pth)?;

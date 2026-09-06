@@ -63,7 +63,5 @@ impl Chip8 {
             (0xF, _, 6, 5) => self.ld_fx65(x),
             _ => {}
         };
-
-        self.keypad[..].fill(false);
     }
 }

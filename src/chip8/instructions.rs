@@ -80,7 +80,7 @@ impl Chip8 {
     pub(super) fn sub_8xy5(&mut self, x: u8, y: u8) {
         let diff = self.registers[x as usize].overflowing_sub(self.registers[y as usize]);
 
-        self.registers[0xF] = diff.1 as u8;
+        self.registers[0xF] = !diff.1 as u8;
         self.registers[x as usize] = diff.0;
     }
 
@@ -93,7 +93,7 @@ impl Chip8 {
     pub(super) fn subn_8xy7(&mut self, x: u8, y: u8) {
         let diff = self.registers[y as usize].overflowing_sub(self.registers[x as usize]);
 
-        self.registers[0xF] = diff.1 as u8;
+        self.registers[0xF] = !diff.1 as u8;
         self.registers[x as usize] = diff.0;
     }
 
@@ -235,8 +235,8 @@ impl Chip8 {
     }
 
     pub(super) fn ld_fx55(&mut self, x: u8) {
-        for i in 0..=self.registers[x as usize] {
-            if self.index + i as u16 >= MEM_SIZE as u16 || i as usize >= NUM_REGISTERS {
+        for i in 0..=x {
+            if self.index + i as u16 >= MEM_SIZE as u16 {
                 break;
             }
 
@@ -245,8 +245,8 @@ impl Chip8 {
     }
 
     pub(super) fn ld_fx65(&mut self, x: u8) {
-        for i in 0..=self.registers[x as usize] {
-            if self.index + i as u16 >= MEM_SIZE as u16 || i as usize >= NUM_REGISTERS {
+        for i in 0..=x {
+            if self.index + i as u16 >= MEM_SIZE as u16 {
                 break;
             }
 
@@ -330,13 +330,13 @@ mod tests {
         dummy.ld_6xkk(1, 9);
         dummy.sub_8xy5(0, 1);
         assert_eq!(dummy.registers[0], 1);
-        assert_eq!(dummy.registers[0xF], 0);
+        assert_eq!(dummy.registers[0xF], 1);
 
         dummy.ld_6xkk(0, 9);
         dummy.ld_6xkk(1, 10);
         dummy.sub_8xy5(0, 1);
         assert_eq!(dummy.registers[0], 255);
-        assert_eq!(dummy.registers[0xF], 1);
+        assert_eq!(dummy.registers[0xF], 0);
 
         dummy.ld_6xkk(0, 7);
         dummy.shr_8xy6(0);
@@ -352,13 +352,13 @@ mod tests {
         dummy.ld_6xkk(1, 10);
         dummy.subn_8xy7(0, 1);
         assert_eq!(dummy.registers[0], 1);
-        assert_eq!(dummy.registers[0xF], 0);
+        assert_eq!(dummy.registers[0xF], 1);
 
         dummy.ld_6xkk(0, 10);
         dummy.ld_6xkk(1, 9);
         dummy.subn_8xy7(0, 1);
         assert_eq!(dummy.registers[0], 255);
-        assert_eq!(dummy.registers[0xF], 1);
+        assert_eq!(dummy.registers[0xF], 0);
 
         dummy.ld_6xkk(0, 255);
         dummy.shl_8xye(0);
