@@ -50,9 +50,10 @@ impl App {
                 last_timer = Instant::now();
             }
 
-            if last_op.elapsed() < TIMEOUT_OPERATION {
-                thread::sleep(TIMEOUT_OPERATION - last_op.elapsed());
-            };
+            let elapsed = last_op.elapsed();
+            if elapsed < TIMEOUT_OPERATION {
+                thread::sleep(TIMEOUT_OPERATION - elapsed);
+            }
             last_op = Instant::now();
         }
         Ok(())
