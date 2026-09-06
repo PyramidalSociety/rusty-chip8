@@ -14,7 +14,7 @@ impl Chip8 {
         self.last_keypress[key as usize] = Some(Instant::now());
     }
 
-    pub(super) fn unpress_key(&mut self) {
+    pub fn unpress_key(&mut self) {
         for key in 0..KEYPAD_SIZE {
             if let Some(last) = self.last_keypress[key as usize] {
                 if last.elapsed() > KEY_TIMEOUT {

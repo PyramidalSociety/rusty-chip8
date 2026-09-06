@@ -24,8 +24,6 @@ impl Chip8 {
     }
 
     pub fn run(&mut self) {
-        self.unpress_key();
-
         let (n, x, y, c, d, kk, nnn) = self.get_vars();
 
         match (c, x, y, d) {
