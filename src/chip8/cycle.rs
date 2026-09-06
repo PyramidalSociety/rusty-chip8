@@ -24,6 +24,8 @@ impl Chip8 {
     }
 
     pub fn run(&mut self) {
+        self.unpress_key();
+
         let (n, x, y, c, d, kk, nnn) = self.get_vars();
 
         match (c, x, y, d) {
@@ -63,7 +65,5 @@ impl Chip8 {
             (0xF, _, 6, 5) => self.ld_fx65(x),
             _ => {}
         };
-
-        self.keypad[..].fill(false);
     }
 }
