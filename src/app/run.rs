@@ -1,10 +1,15 @@
-use std::time::Duration;
-
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 use ratatui::DefaultTerminal;
-use std::io;
+
+use std::{
+    io, thread,
+    time::{Duration, Instant},
+};
 
 use super::*;
+
+const TIMEOUT_TIMER: Duration = Duration::from_nanos(16666667);
+const TIMEOUT_OPERATION: Duration = Duration::from_nanos(1428571);
 
 fn map_key(key: KeyCode) -> Option<u8> {
     match key {
@@ -30,10 +35,25 @@ fn map_key(key: KeyCode) -> Option<u8> {
 
 impl App {
     pub fn run(mut self, mut terminal: DefaultTerminal) -> io::Result<()> {
+        let mut last_timer = Instant::now();
+        let mut last_op = Instant::now();
+
         while !self.exit {
             self.get_input()?;
             self.chip8.run();
+
             terminal.draw(|frame| self.draw(frame))?;
+
+            if last_timer.elapsed() > TIMEOUT_TIMER {
+                self.chip8.decrease_delay_timer();
+                self.chip8.decrease_sound_timer();
+                last_timer = Instant::now();
+            }
+
+            if last_op.elapsed() < TIMEOUT_OPERATION {
+                thread::sleep(TIMEOUT_OPERATION - last_op.elapsed());
+            };
+            last_op = Instant::now();
         }
         Ok(())
     }
