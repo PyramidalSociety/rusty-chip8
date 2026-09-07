@@ -35,19 +35,31 @@ fn map_key(key: KeyCode) -> Option<u8> {
 
 impl App {
     pub fn run(mut self, mut terminal: DefaultTerminal) -> io::Result<()> {
-        let mut last_timer = Instant::now();
         let mut last_op = Instant::now();
+
+        let mut last_area = terminal.size()?;
 
         while !self.exit {
             self.get_input()?;
-            self.chip8.run();
+            let draw_instr = self.chip8.run();
 
-            terminal.draw(|frame| self.draw(frame))?;
+            if self.chip8.sound_on() {
+                self.beeper.play();
+            } else {
+                self.beeper.pause();
+            }
 
-            if last_timer.elapsed() > TIMEOUT_TIMER {
+            if last_area != terminal.size()? || draw_instr {
+                last_area = terminal.size()?;
+                terminal.draw(|frame| self.draw(frame))?;
+            }
+
+            if self.chip8.get_epalsed_delay() >= TIMEOUT_TIMER {
                 self.chip8.decrease_delay_timer();
+            }
+
+            if self.chip8.get_elapsed_sound() >= TIMEOUT_TIMER {
                 self.chip8.decrease_sound_timer();
-                last_timer = Instant::now();
             }
 
             let elapsed = last_op.elapsed();

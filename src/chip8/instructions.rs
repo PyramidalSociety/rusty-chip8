@@ -206,10 +206,12 @@ impl Chip8 {
 
     pub(super) fn ld_fx15(&mut self, x: u8) {
         self.delay_timer = self.registers[x as usize];
+        self.last_delay_decrease = Some(Instant::now());
     }
 
     pub(super) fn ld_fx18(&mut self, x: u8) {
         self.sound_timer = self.registers[x as usize];
+        self.last_sound_decrease = Some(Instant::now());
     }
 
     pub(super) fn add_fx1e(&mut self, x: u8) {
