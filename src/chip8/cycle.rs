@@ -23,7 +23,7 @@ impl Chip8 {
         (n as u8, x as u8, y as u8, c as u8, d as u8, kk as u8, nnn)
     }
 
-    pub fn run(&mut self) {
+    pub fn run(&mut self) -> bool {
         let (n, x, y, c, d, kk, nnn) = self.get_vars();
 
         match (c, x, y, d) {
@@ -63,5 +63,7 @@ impl Chip8 {
             (0xF, _, 6, 5) => self.ld_fx65(x),
             _ => {}
         };
+
+        c == 0xD
     }
 }
