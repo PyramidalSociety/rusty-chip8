@@ -1,5 +1,5 @@
 use crate::chip8::Chip8;
-use std::{error::Error, path::Path};
+use std::{io, path::Path};
 
 mod beeper;
 mod draw;
@@ -14,7 +14,7 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(pth: &Path) -> Result<App, Box<dyn Error>> {
+    pub fn new(pth: &Path) -> io::Result<App> {
         Ok(Self {
             chip8: Chip8::new(&pth)?,
             beeper: Beeper::new(),

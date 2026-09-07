@@ -29,6 +29,8 @@ pub struct Chip8 {
     keypad: [bool; KEYPAD_SIZE],
     video: [bool; VIDEO_SIZE],
     last_keypress: [Option<Instant>; KEYPAD_SIZE],
+    last_sound_decrease: Option<Instant>,
+    last_delay_decrease: Option<Instant>,
 }
 
 impl Chip8 {
@@ -45,6 +47,8 @@ impl Chip8 {
             keypad: [false; KEYPAD_SIZE],
             video: [false; VIDEO_SIZE],
             last_keypress: [None; KEYPAD_SIZE],
+            last_sound_decrease: None,
+            last_delay_decrease: None,
         };
 
         new_obj.load_rom(pth)?;

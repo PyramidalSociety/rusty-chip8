@@ -13,6 +13,7 @@ impl Beeper {
 
         let source = SquareWave::new(440.0).repeat_infinite();
         player.append(source);
+        player.pause();
 
         Self {
             _handle: handle,
