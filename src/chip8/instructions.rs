@@ -73,34 +73,36 @@ impl Chip8 {
     pub(super) fn add_8xy4(&mut self, x: u8, y: u8) {
         let sum = self.registers[x as usize].overflowing_add(self.registers[y as usize]);
 
-        self.registers[0xF] = sum.1 as u8;
         self.registers[x as usize] = sum.0;
+        self.registers[0xF] = sum.1 as u8;
     }
 
     pub(super) fn sub_8xy5(&mut self, x: u8, y: u8) {
         let diff = self.registers[x as usize].overflowing_sub(self.registers[y as usize]);
 
-        self.registers[0xF] = !diff.1 as u8;
         self.registers[x as usize] = diff.0;
+        self.registers[0xF] = !diff.1 as u8;
     }
 
     pub(super) fn shr_8xy6(&mut self, x: u8) {
-        self.registers[0xF] = self.registers[x as usize] & 1;
+        let carry = self.registers[x as usize] & 1;
 
         self.registers[x as usize] >>= 1;
+        self.registers[0xF] = carry;
     }
 
     pub(super) fn subn_8xy7(&mut self, x: u8, y: u8) {
         let diff = self.registers[y as usize].overflowing_sub(self.registers[x as usize]);
 
-        self.registers[0xF] = !diff.1 as u8;
         self.registers[x as usize] = diff.0;
+        self.registers[0xF] = !diff.1 as u8;
     }
 
     pub(super) fn shl_8xye(&mut self, x: u8) {
-        self.registers[0xF] = (self.registers[x as usize] & 0x80) >> 0x7;
+        let carry = (self.registers[x as usize] & 0x80) >> 0x7;
 
         self.registers[x as usize] <<= 1;
+        self.registers[0xF] = carry;
     }
 
     pub(super) fn sne_9xy0(&mut self, x: u8, y: u8) {
