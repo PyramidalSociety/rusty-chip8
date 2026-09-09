@@ -3,6 +3,7 @@ use std::{io, path::Path};
 
 mod beeper;
 mod draw;
+mod input;
 pub mod run;
 
 use beeper::Beeper;
