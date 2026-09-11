@@ -11,8 +11,8 @@ use super::*;
 const VIDEO_WIDTH: usize = 64;
 const VIDEO_HEIGHT: usize = 32;
 
-const MIN_WIDTH: u16 = VIDEO_WIDTH as u16 + 2;
-const MIN_HEIGHT: u16 = (VIDEO_HEIGHT / 2) as u16 + 2;
+const MIN_WIDTH: u16 = VIDEO_WIDTH as u16 + 6;
+const MIN_HEIGHT: u16 = (VIDEO_HEIGHT / 2) as u16 + 4;
 
 impl App {
     pub(super) fn draw(&self, frame: &mut Frame) {
@@ -34,20 +34,27 @@ impl App {
             return;
         }
 
+        let scale = ((area.width - 6) / VIDEO_WIDTH as u16)
+            .min((area.height - 4) / (VIDEO_HEIGHT as u16 / 2))
+            .max(1);
+
+        let screen_width = VIDEO_WIDTH as u16 * scale;
+        let screen_height = VIDEO_HEIGHT as u16 / 2 * scale;
+
+        let tui_area = Rect {
+            x: area.x + (area.width - screen_width - 6) / 2,
+            y: area.y + (area.height - screen_height - 4) / 2,
+            width: screen_width + 6,
+            height: screen_height + 4,
+        };
+
         let block = Block::default()
             .borders(Borders::ALL)
             .title("Rusty CHIP-8")
             .title_alignment(Alignment::Center);
 
-        let inner = block.inner(area);
-        frame.render_widget(block, area);
-
-        let scale = (inner.width / VIDEO_WIDTH as u16)
-            .min(inner.height / (VIDEO_HEIGHT as u16 / 2))
-            .max(1);
-
-        let screen_width = VIDEO_WIDTH as u16 * scale;
-        let screen_height = VIDEO_HEIGHT as u16 / 2 * scale;
+        let inner = block.inner(tui_area);
+        frame.render_widget(block, tui_area);
 
         let screen_area = Rect {
             x: inner.x + (inner.width - screen_width) / 2,
