@@ -4,6 +4,7 @@ use clap::{Arg, command, value_parser};
 
 pub fn get_path() -> PathBuf {
     let mut matches = command!()
+        .about("A CHIP-8 emulator TUI written in Rust")
         .arg(
             Arg::new("path")
                 .value_parser(value_parser!(PathBuf))
