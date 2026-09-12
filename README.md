@@ -64,3 +64,11 @@ The CHIP-8 uses a 16-key hexadecimal keypad, mapped to the keyboard as follows:
 | `4` `5` `6` `D` | `Q` `W` `E` `R` |
 | `7` `8` `9` `E` | `A` `S` `D` `F` |
 | `A` `0` `B` `F` | `Z` `X` `C` `V` |
+
+## Games
+
+Looking for ROMs to try out? Here are some good places to find CHIP-8 games:
+
+- [CHIP-8 Archive](https://johnearnest.github.io/chip8Archive/?sort=platform#chip8) — a curated collection of public-domain CHIP-8 programs
+- [kripod/chip8-roms](https://github.com/kripod/chip8-roms/tree/master/games) — a GitHub repo with a large collection of classic CHIP-8 game ROMs
+- [Pong-Story CHIP-8 page](https://www.pong-story.com/chip8/) — home of David Winter's original CHIP-8 emulator and games archive, with classics like PONG, BRIX, and INVADERS
