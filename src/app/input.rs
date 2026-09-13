@@ -28,7 +28,9 @@ fn map_key(key: KeyCode) -> Option<u8> {
 
 impl App {
     pub(super) fn get_input(&mut self) -> io::Result<()> {
-        self.chip8.unpress_key();
+        if !self.enhanced {
+            self.chip8.unpress_key_timeout();
+        }
 
         while event::poll(Duration::from_millis(0))? {
             if let Event::Key(key) = event::read()? {
@@ -38,11 +40,15 @@ impl App {
                 }
 
                 if key.kind == KeyEventKind::Release {
+                    if let Some(key) = map_key(key.code) {
+                        self.chip8.unpress_key(key);
+                    }
+
                     continue;
                 }
 
                 if let Some(key) = map_key(key.code) {
-                    self.chip8.press_key(key);
+                    self.chip8.press_key(key, self.enhanced);
                 }
             }
         }

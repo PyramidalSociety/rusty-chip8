@@ -2,19 +2,22 @@ use std::time::Duration;
 
 use super::*;
 
-const KEY_TIMEOUT: Duration = Duration::from_millis(150);
+const KEY_TIMEOUT: Duration = Duration::from_millis(100);
 
 impl Chip8 {
-    pub fn press_key(&mut self, key: u8) {
+    pub fn press_key(&mut self, key: u8, enhanced: bool) {
         if key as usize >= KEYPAD_SIZE {
             return;
         }
 
         self.keypad[key as usize] = true;
-        self.last_keypress[key as usize] = Some(Instant::now());
+
+        if !enhanced {
+            self.last_keypress[key as usize] = Some(Instant::now());
+        }
     }
 
-    pub fn unpress_key(&mut self) {
+    pub fn unpress_key_timeout(&mut self) {
         for key in 0..KEYPAD_SIZE {
             if let Some(last) = self.last_keypress[key as usize] {
                 if last.elapsed() > KEY_TIMEOUT {
@@ -23,5 +26,13 @@ impl Chip8 {
                 }
             }
         }
+    }
+
+    pub fn unpress_key(&mut self, key: u8) {
+        if key as usize >= KEYPAD_SIZE {
+            return;
+        }
+
+        self.keypad[key as usize] = false;
     }
 }
