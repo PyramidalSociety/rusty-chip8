@@ -6,7 +6,7 @@ A terminal-based (TUI) CHIP-8 emulator written in Rust using the [Ratatui](https
 
 CHIP-8 is an interpreted programming language developed by Joseph Weisbecker in the mid 70s. The language uses hexadecimal codes for instructions, making it look similar to machine code. CHIP-8 interpreters have been developed for many devices such as computers, microcomputers, graphing calculators, mobile phones and video game consoles.
 
-## Why this project
+## Why this project?
 
 The main motivation behind the project was to learn lower level programming concepts and to get more familiar with the Rust programming language.
 
