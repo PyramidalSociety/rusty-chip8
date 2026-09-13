@@ -65,6 +65,14 @@ The CHIP-8 uses a 16-key hexadecimal keypad, mapped to the keyboard as follows:
 | `7` `8` `9` `E` | `A` `S` `D` `F` |
 | `A` `0` `B` `F` | `Z` `X` `C` `V` |
 
+## Limitations
+
+Because of the way terminals handle input, some games where you need to press more than one key at once or where you need to hold a key (such as [Rush Hour](https://github.com/kripod/chip8-roms/blob/master/games/Rush%20Hour%20%5BHap%2C%202006%5D.ch8) or [Space Racer](https://johnearnest.github.io/chip8Archive/play.html?p=spaceracer)) may not work as intended on all terminals.
+
+Rusty CHIP-8 automatically detects and uses the [Kitty keyboard protocol](https://sw.kovidgoyal.net/kitty/keyboard-protocol/) when your terminal supports it, which allows real simultaneous key presses to be detected correctly. This is currently supported by terminals such as **kitty**, **foot**, **WezTerm**, and **Alacritty**.
+
+On terminals without this support (e.g. most default Linux terminal emulators, Windows Terminal, etc.), simultaneous key presses or key holding may not register as expected.
+
 ## Games
 
 Looking for ROMs to try out? Here are some good places to find CHIP-8 games:
